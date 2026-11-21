@@ -23,7 +23,7 @@ namespace GestorOS.Models
 
         [DataType(DataType.Date)]
         [Display(Name = "Data de Cadastro")]
-        public DateTime DataCadastro { get; set; } = DateTime.Now;
+        public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
         public ICollection<OrdemServico> Ordens { get; set; } = new  List<OrdemServico>();
     }
 }
