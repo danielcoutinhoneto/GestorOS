@@ -20,7 +20,7 @@ namespace GestorOS.Models
         [Required(ErrorMessage = "A Data de Abertura é obrigatória.")]
         [Display(Name = "Data de Abertura")]
         [DataType(DataType.Date)]
-        public DateTime DataAbertura { get; set; } = DateTime.Now;
+        public DateTime DataAbertura { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Data de Conclusão")]
         [DataType(DataType.Date)]

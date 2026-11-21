@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -17,10 +18,10 @@ namespace GestorOS.Migrations
                 name: "CategoriasServico",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    Descricao = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -31,12 +32,12 @@ namespace GestorOS.Migrations
                 name: "Clientes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Telefone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DataCadastro = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
+                    Telefone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,16 +48,16 @@ namespace GestorOS.Migrations
                 name: "OrdensServico",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Descricao = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Observacoes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    DataAbertura = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataConclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    ClienteId = table.Column<int>(type: "int", nullable: false),
-                    CategoriaServicoId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Descricao = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Observacoes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    DataAbertura = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DataConclusao = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Valor = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    ClienteId = table.Column<int>(type: "integer", nullable: false),
+                    CategoriaServicoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
