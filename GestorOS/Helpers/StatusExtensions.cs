@@ -26,8 +26,8 @@ namespace GestorOS.Helpers
         {
             StatusOrdem.Aberta => "fa-folder-open",
             StatusOrdem.EmAndamento => "fa-gear",
-            StatusOrdem.Cancelada => "fa-circle-check",
-            StatusOrdem.Concluida => "fa-circle-xmark",
+            StatusOrdem.Cancelada => "fa-circle-xmark",
+            StatusOrdem.Concluida => "fa-circle-check",
             _ => "fa-circle"
         };
     }

@@ -20,7 +20,8 @@ namespace GestorOS.Controllers
 
             if(!string.IsNullOrWhiteSpace(busca))
             {
-                query = query.Where(c => c.Nome.Contains(busca));
+                //query = query.Where(c => c.Nome.Contains(busca));
+                query = query.Where(c => EF.Functions.ILike(EF.Functions.Unaccent(c.Nome), "%" + EF.Functions.Unaccent(busca) + "%"));
             }
 
             ViewBag.Busca = busca;

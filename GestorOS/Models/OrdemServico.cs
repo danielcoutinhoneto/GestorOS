@@ -35,10 +35,15 @@ namespace GestorOS.Models
         [Column(TypeName = "decimal(10, 2)")]
         public decimal Valor { get; set; }
 
+        [Required(ErrorMessage = "Informe o cliente.")]
+        [Display(Name = "Cliente")]
         public int ClienteId { get; set; }
         public Cliente? Cliente { get; set; }
+
+        [Required(ErrorMessage = "Informe a categoria.")]
+        [Display(Name = "Categoria")]
+        public int? CategoriaServicoId { get; set; }
         public CategoriaServico? CategoriaServico { get; set; }
         
-        public int? CategoriaServicoId { get; set; }
     }
 }

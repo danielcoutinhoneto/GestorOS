@@ -1,0 +1,72 @@
+﻿@using GestorOS.Helpers
+@using GestorOS.Models.Enuns
+@model OrdemServico
+@{
+    ViewData["Title"] = $"Ordem de Serviço #{Model.Id}";
+}
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h4 class="mb-1">Ordem de Serviço #@Model.Id</h4>
+                    <span class="badge @Model.Status.ParaClasseBadge() fs-6">
+                        <i class="fa-solid @Model.Status.ParaIcone() me-1"></i>@Model.Status.ParaTexto()
+                    </span>
+                </div>
+                <a asp-action="Imprimir" asp-route-id="@Model.Id" target="_blank" class="btn btn-outline-secondary btn-sm">
+                    <i class="fa-solid fa-print me-1"></i>Imprimir
+                </a>
+            </div>
+
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Cliente</dt>
+                <dd class="col-sm-8">@Model.Cliente?.Nome</dd>
+
+                <dt class="col-sm-4">Categoria</dt>
+                <dd class="col-sm-8">@(Model.CategoriaServico?.Nome ?? "Não informada")</dd>
+
+                <dt class="col-sm-4">Descrição</dt>
+                <dd class="col-sm-8">@Model.Descricao</dd>
+
+                <dt class="col-sm-4">Observações</dt>
+                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Observacoes) ? "-" : Model.Observacoes)</dd>
+
+                <dt class="col-sm-4">Data de abertura</dt>
+                <dd class="col-sm-8">@Model.DataAbertura.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-4">Data de conclusão</dt>
+                <dd class="col-sm-8">@(Model.DataConclusao?.ToString("dd/MM/yyyy") ?? "-")</dd>
+
+                <dt class="col-sm-4">Valor</dt>
+                <dd class="col-sm-8 fw-bold">@Model.Valor.ToString("C")</dd>
+            </dl>
+
+            <div class="mt-3">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Editar</a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Voltar</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h6 class="mb-3">Alterar status</h6>
+            <div class="d-grid gap-2">
+                @foreach (StatusOrdem status in Enum.GetValues(typeof(StatusOrdem)))
+                {
+                    <form asp-action="AlterarStatus" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="novoStatus" value="@status" />
+                        <button type="submit"
+                                class="btn btn-sm w-100 @(Model.Status == status ? "btn-secondary" : "btn-outline-secondary")"
+                            @(Model.Status == status ? "disabled" : "")>
+                            <i class="fa-solid @status.ParaIcone() me-1"></i>@status.ParaTexto()
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

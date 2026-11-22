@@ -1,8 +1,92 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using GestorOS.Helpers
+@model List<OrdemServico>
+@{
+    ViewData["Title"] = "Início";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0">Painel geral</h3>
+        <span class="text-muted">Resumo rápido do sistema de ordens de serviço</span>
+    </div>
+    <a asp-controller="OrdensServico" asp-action="Create" class="btn btn-primary">
+        <i class="fa-solid fa-plus me-1"></i>Nova Ordem
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card card-dashboard p-3 h-100">
+            <div class="text-muted small">Clientes cadastrados</div>
+            <div class="fs-2 fw-bold">@ViewBag.TotalClientes</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-dashboard p-3 h-100">
+            <div class="text-muted small">Ordens abertas</div>
+            <div class="fs-2 fw-bold">@ViewBag.OrdensAbertas</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-dashboard p-3 h-100">
+            <div class="text-muted small">Em andamento</div>
+            <div class="fs-2 fw-bold">@ViewBag.OrdensAndamento</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card resumo-valor p-3 h-100">
+            <div class="small opacity-75">Valor total em ordens</div>
+            <div class="fs-2 fw-bold">@(((decimal)ViewBag.ValorTotal).ToString("C"))</div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Últimas ordens de serviço</h5>
+        <a asp-controller="OrdensServico" asp-action="Index" class="btn btn-sm btn-outline-primary">Ver todas</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted mb-0">Nenhuma ordem cadastrada ainda. Que tal criar a primeira?</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th class="text-end">Valor</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ordem in Model)
+                    {
+                        <tr>
+                            <td>@ordem.Cliente?.Nome</td>
+                            <td>@ordem.Descricao</td>
+                            <td>@ordem.DataAbertura.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="badge @ordem.Status.ParaClasseBadge()">
+                                    <i class="fa-solid @ordem.Status.ParaIcone() me-1"></i>@ordem.Status.ParaTexto()
+                                </span>
+                            </td>
+                            <td class="text-end">@ordem.Valor.ToString("C")</td>
+                            <td class="text-end">
+                                <a asp-controller="OrdensServico" asp-action="Details" asp-route-id="@ordem.Id" class="btn btn-sm btn-outline-primary">
+                                    Ver <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
