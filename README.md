@@ -2,9 +2,9 @@
 
 **Aplicação web para gerenciamento de clientes e ordens de serviço.**
 
-O GestorOS é um projeto em desenvolvimento criado para praticar a construção de aplicações com **ASP.NET Core MVC**, **Entity Framework Core** e **SQL Server**. Seu objetivo é reunir informações de clientes e organizar o acompanhamento de serviços em uma interface simples.
+O GestorOS é um projeto em desenvolvimento criado para praticar a construção de aplicações com **ASP.NET Core MVC** e **Entity Framework Core**. Atualmente, a aplicação está configurada para usar **PostgreSQL** e também pode ser adaptada para **SQL Server**. Seu objetivo é reunir informações de clientes e organizar o acompanhamento de serviços em uma interface simples.
 
-> 🚧 **Status:** projeto em desenvolvimento. O gerenciamento de clientes está implementado; os módulos de ordens de serviço e categorias ainda estão em construção.
+> 🚧 **Status:** projeto em desenvolvimento, com gerenciamento de clientes, categorias e ordens de serviço.
 
 ---
 
@@ -12,7 +12,7 @@ O GestorOS é um projeto em desenvolvimento criado para praticar a construção 
 
 O GestorOS foi desenvolvido como projeto de aprendizado e portfólio, aplicando conceitos de desenvolvimento web com .NET, arquitetura MVC, persistência de dados e validação de formulários.
 
-A aplicação já permite gerenciar clientes e consultar as ordens associadas a cada um. A estrutura de dados para ordens de serviço e categorias também foi criada e servirá de base para as próximas funcionalidades.
+A aplicação permite gerenciar clientes, categorias e ordens de serviço, além de acompanhar indicadores e consultar as ordens associadas a cada cliente.
 
 ### 🎬 Origem e evolução
 
@@ -44,11 +44,11 @@ A estrutura de dados inclui:
 - Cliente e categoria associados.
 - Status: aberta, em andamento, concluída ou cancelada.
 
-A apresentação do status utiliza textos e cores para facilitar a identificação. As telas e operações de gerenciamento de ordens ainda estão em desenvolvimento.
+A aplicação permite cadastrar, listar, filtrar, editar, excluir, consultar e imprimir ordens, além de alterar seu status. A apresentação do status utiliza textos e cores para facilitar a identificação.
 
 ### 🗂️ Categorias
 
-O banco possui uma estrutura para categorias de serviço e uma carga inicial com **Manutenção**, **Instalação** e **Consultoria**. As telas de gerenciamento de categorias ainda estão em desenvolvimento.
+É possível gerenciar categorias de serviço. O banco também possui uma carga inicial com **Manutenção**, **Instalação** e **Consultoria**.
 
 ## 🧰 Tecnologias utilizadas
 
@@ -57,7 +57,8 @@ O banco possui uma estrutura para categorias de serviço e uma carga inicial com
 | **C# e .NET 10** | Linguagem e plataforma da aplicação |
 | **ASP.NET Core MVC** | Organização dos controladores, modelos e views |
 | **Entity Framework Core** | Acesso aos dados e migrations |
-| **SQL Server** | Banco de dados relacional |
+| **PostgreSQL e Npgsql** | Banco de dados relacional e provedor para Entity Framework Core |
+| **SQL Server** | Alternativa de banco de dados, mediante adaptação da configuração e das consultas |
 | **Razor** | Renderização das páginas |
 | **Bootstrap 5** | Componentes e estrutura visual |
 | **Font Awesome** | Ícones da interface |
@@ -84,7 +85,7 @@ GestorOS/
 ### Pré-requisitos
 
 - [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0).
-- SQL Server ou SQL Server Express.
+- PostgreSQL 17, instalado localmente ou executado em Docker, para a configuração atual; ou SQL Server, caso adapte o projeto para esse provedor.
 - Um editor, como Visual Studio ou Visual Studio Code.
 - Ferramenta de linha de comando `dotnet-ef`.
 
@@ -103,9 +104,25 @@ dotnet restore
 
 ### 3. Configure a conexão com o banco
 
-O projeto usa **User Secrets** para a conexão local em ambiente de desenvolvimento.
+O projeto usa **User Secrets** para a conexão local em ambiente de desenvolvimento. Escolha uma das opções abaixo conforme o banco utilizado.
 
-No Visual Studio, clique com o botão direito no projeto **GestorOS** e selecione **Gerenciar Segredos do Usuário**. No arquivo aberto, configure a conexão:
+No Visual Studio, clique com o botão direito no projeto **GestorOS** e selecione **Gerenciar Segredos do Usuário**. No arquivo aberto, configure a conexão.
+
+#### PostgreSQL — configuração atual
+
+```json
+{
+  "ConnectionStrings": {
+    "GestorOsConnection": "Host=localhost;Port=5432;Database=GestorOS;Username=postgres;Password=SUA_SENHA"
+  }
+}
+```
+
+Substitua os valores pelos dados do seu PostgreSQL. O nome do banco deve corresponder exatamente ao existente no servidor, incluindo letras maiúsculas e minúsculas. Com a aplicação no computador e o PostgreSQL em um contêiner com a porta 5432 publicada, use `localhost` como host.
+
+#### SQL Server — configuração alternativa
+
+Para uma instância local com autenticação integrada do Windows, o formato da conexão é:
 
 ```json
 {
@@ -115,13 +132,21 @@ No Visual Studio, clique com o botão direito no projeto **GestorOS** e selecion
 }
 ```
 
-Substitua `SEU_SERVIDOR` pelo endereço ou nome da sua instância do SQL Server. Se a instância for informada no formato `SERVIDOR\INSTANCIA`, use duas barras invertidas no JSON: `SERVIDOR\\INSTANCIA`.
+Substitua `SEU_SERVIDOR` pelo endereço da instância. Se usar `SERVIDOR\INSTANCIA`, escreva `SERVIDOR\\INSTANCIA` no JSON. Ajuste a autenticação e o certificado ao seu ambiente; `TrustServerCertificate=True` é um exemplo para desenvolvimento local.
+
+**Trocar apenas a string de conexão não é suficiente.** Para usar SQL Server, também é necessário:
+
+- Em `Program.cs`, configurar o contexto com `UseSqlServer(...)` no lugar de `UseNpgsql(...)`. O pacote do provedor SQL Server já está referenciado no projeto.
+- Adaptar as consultas que usam `EF.Functions.ILike` e `EF.Functions.Unaccent`, pois são específicas do PostgreSQL. Escolha uma collation do SQL Server adequada para buscas sem distinção de maiúsculas e acentos.
+- Criar e manter migrations próprias para SQL Server. As migrations atuais foram geradas para PostgreSQL e não devem ser aplicadas diretamente ao SQL Server. Revise a estratégia de migrations antes de aplicá-las em um banco existente.
+
+Essas adaptações não estão implementadas na configuração atual; os passos seguintes descrevem o uso com PostgreSQL.
 
 O valor em `appsettings.json` é apenas uma orientação e não é uma conexão válida. Não publique senhas ou conexões reais no repositório.
 
 > 🔐 User Secrets é destinado ao desenvolvimento local e não criptografa os valores. Em produção, utilize o mecanismo de gerenciamento de segredos do ambiente de hospedagem.
 
-### 4. Prepare o banco de dados
+### 4. Prepare o banco PostgreSQL
 
 Se ainda não tiver a ferramenta `dotnet-ef`, instale uma versão compatível:
 
@@ -135,14 +160,42 @@ Se ela já estiver instalada, atualize-a, se necessário:
 dotnet tool update --global dotnet-ef --version 10.0.15
 ```
 
-> ⚠️ O modelo atual possui alterações ainda não registradas em uma migration. Antes de atualizar o banco, é necessário criar e revisar uma nova migration. Isso gera arquivos no projeto; em um trabalho colaborativo, normalmente a migration é criada e versionada pelo responsável pela alteração do modelo.
+Verifique se há alterações no modelo ainda não registradas em uma migration:
 
 ```bash
-dotnet ef migrations add AtualizarModeloCliente --project GestorOS/GestorOS.csproj
+dotnet ef migrations has-pending-model-changes --project GestorOS/GestorOS.csproj
+```
+
+Se houver alterações pendentes, crie e revise uma migration antes de continuar:
+
+```bash
+dotnet ef migrations add AtualizarModelo --project GestorOS/GestorOS.csproj
+```
+
+Em seguida, aplique as migrations:
+
+```bash
 dotnet ef database update --project GestorOS/GestorOS.csproj
 ```
 
-A migration inicial cria as tabelas e cadastra as categorias iniciais.
+As migrations existentes criam as tabelas e cadastram as categorias iniciais. Se o banco ainda não existir, o usuário precisa ter permissão para criá-lo; caso contrário, crie-o previamente. Em um trabalho colaborativo, compartilhe as migrations geradas junto com as alterações do modelo.
+
+As buscas de clientes usam a extensão PostgreSQL `unaccent` para ignorar acentos, em conjunto com `ILIKE` para ignorar diferenças entre maiúsculas e minúsculas. Habilite-a **no banco configurado na conexão**, por exemplo, executando no cliente SQL:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS unaccent;
+```
+
+Para um contêiner chamado `postgres_db`, com usuário `postgres` e banco `GestorOS`, execute:
+
+```powershell
+docker exec -it postgres_db psql -U postgres -d GestorOS -c "CREATE EXTENSION IF NOT EXISTS unaccent;"
+docker exec -it postgres_db psql -U postgres -d GestorOS -c "SELECT unaccent('João');"
+```
+
+O resultado do teste deve ser `Joao`. Ajuste o nome do contêiner, usuário e banco conforme sua instalação. O usuário precisa ter permissão para criar a extensão; repita o procedimento em cada banco utilizado, inclusive quando um banco for recriado.
+
+As datas de abertura e conclusão usam UTC e são armazenadas em colunas `timestamp with time zone`. Para apresentar um horário local, converta-o para o fuso desejado; as variáveis `TZ` e `PGTZ` do contêiner não substituem essa conversão na aplicação.
 
 ### 5. Execute a aplicação
 
@@ -154,9 +207,7 @@ Abra o endereço HTTPS informado no terminal. Na configuração atual, o perfil 
 
 ## 🗺️ Próximos passos
 
-- Implementar o gerenciamento de ordens de serviço.
-- Implementar as telas de categorias de serviço.
-- Evoluir a página inicial da aplicação.
+- Evoluir o gerenciamento de ordens de serviço e o painel inicial.
 - Implementar controle de acesso e autenticação.
 - Criar perfis de acesso com permissões adequadas para cada usuário.
 - Implementar o envio de cobranças por e-mail e WhatsApp.
